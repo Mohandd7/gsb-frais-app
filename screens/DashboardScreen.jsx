@@ -19,3 +19,11 @@ const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { padding: 16 },
 });
+
+
+{/* Question 7 :
+Je mettrais en priorité l'année-mois, l'ID visiteur,
+le montant saisi et le montant validé.
+Les autres informations seraient en second plan
+pour garder la carte simple et lisible.
+*/}
