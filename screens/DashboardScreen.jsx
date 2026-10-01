@@ -32,20 +32,20 @@ export default function DashboardScreen() {
   }, []);
 
   const filteredFrais = fraisList
-    // Question 20 : exclure les montants non validés si le filtre est activé
+    
     .filter(
       (frais) =>
         !filterNonNull || frais.montantvalide !== null
     )
 
-    // Question 17 : recherche par année-mois ou ID visiteur
+    
     .filter(
       (frais) =>
         frais.anneemois.includes(searchTerm) ||
         frais.id_visiteur.toString().includes(searchTerm)
     )
 
-    // Question 23 : filtre sur le montant minimum
+    
     .filter(
       (frais) =>
         montantMinimum === "" ||
@@ -69,7 +69,7 @@ export default function DashboardScreen() {
       <View style={styles.content}>
         <Text>Bienvenue {user}</Text>
 
-        {/* Question 18 : recherche */}
+        
         <TextInput
           placeholder="Rechercher par année-mois ou ID visiteur..."
           value={searchTerm}
@@ -77,7 +77,7 @@ export default function DashboardScreen() {
           style={styles.searchInput}
         />
 
-        {/* Question 21 : filtre montant validé */}
+        
         <View style={styles.filterRow}>
           <Switch
             value={filterNonNull}
@@ -89,7 +89,7 @@ export default function DashboardScreen() {
           </Text>
         </View>
 
-        {/* Question 23 : montant minimum */}
+        
         <TextInput
           placeholder="Montant validé minimum..."
           value={montantMinimum}
@@ -133,3 +133,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
 });
+
+/*
+Question 7 :
+Je mettrais en priorité l'année-mois, l'ID visiteur,
+le montant saisi et le montant validé.
+Les autres informations seraient en second plan
+pour garder la carte simple et lisible.
+*/
+

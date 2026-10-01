@@ -5,14 +5,14 @@ import Navbar from "../components/Navbar";
 import { loginStyles as styles } from "../styles/loginStyles.js";
 
 export default function LoginScreen() {
-  // États locaux pour les champs du formulaire
+  
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
 
   // Fonction de connexion
   const { loginUser } = useAuth();
 
-  // Fonction appelée quand on clique sur le bouton
+  
   const handleSubmit = () => {
     if (!loginUser(login, password)) {
       Alert.alert("Identifiants incorrects");
