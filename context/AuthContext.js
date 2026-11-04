@@ -1,42 +1,78 @@
-import { createContext, useContext, useState } from "react";
- 
-// 1. Création du contexte
-const AuthContext = createContext();
- 
-// 2. Fournisseur du contexte (AuthProvider)
-export function AuthProvider({ children }) {
-  // État local pour stocker l’utilisateur (null = non connecté)
-  const [user, setUser] = useState(null);
+import React, { createContext, useContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { signIn, signOut } from "../services/authService";
 
-  // 3. Fonction de connexion
-  const loginUser = (login, password) => {
-    // ToDo : implémenter une connexion avec une logique simplifiée : vérifie
-    // si login/mot de passe correspondent à des valeurs prédéfinies
-    // Si le login vaut "Andre" et le mot de passe vaut "secret"
-    // alors mettre à jour l’état avec le login de l’utilisateur connecté ET renvoyer true
-    if (login==="Andre" && password==="secret"){
-        setUser(login);
-        return true;
+const AuthContext = createContext();
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [sessionLoading, setSessionLoading] = useState(true);
+
+  async function loginUser(login, password) {
+    // Créer une variable data qui stocke la valeur renvoyée par signIn
+    const data = await signIn(login, password);
+
+    const authToken = data?.token || data?.access_token;
+    // Vérifier si la connexion a réussi
+    if (!authToken) {
+      throw new Error(data?.error || "Identifiants incorrects");
     }
-    // Si la connexion échoue, renvoyer false
-    return false;
-  };
- 
-  // 4. Fonction de déconnexion
-  const logoutUser = () => {
-    // ToDo : réinitialiser la valeur de l’état à null
+
+    // Affecter la valeur data.visiteur à l'état user
+    setUser(data.visiteur);
+
+    // Affecter la valeur authToken à l'état token
+    setToken(authToken);
+
+    // Renvoyer data
+    return data;
+  }
+
+  const logoutUser = async () => {
+    await signOut();
     setUser(null);
+    setToken(null);
   };
- 
-  // 5. Valeurs exposées aux composants enfants
+
+  useEffect(() => {
+    const restoreSession = async () => {
+      try {
+        const storedUser = await getCurrentUser();
+        const storedToken = await getAuthToken();
+        if (storedUser && storedToken) {
+          setUser(storedUser);
+          setToken(storedToken);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la restauration de session : ", error);
+      } finally {
+        setSessionLoading(false);
+      }
+    };
+
+    restoreSession();
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, loginUser, logoutUser }}>
+    <AuthContext.Provider
+      value={{ user, token, sessionLoading, loginUser, logoutUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
- 
-// 6. Hook personnalisé pour utiliser le contexte facilement
+
+export const getCurrentUser = async () => {
+  const raw = await AsyncStorage.getItem("user");
+  return raw ? JSON.parse(raw) : null;
+};
+
+export const getAuthToken = async () => {
+  const storedToken = await AsyncStorage.getItem("token");
+  return storedToken || null;
+};
+
 export function useAuth() {
   return useContext(AuthContext);
 }

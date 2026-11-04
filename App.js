@@ -1,25 +1,42 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { View, ActivityIndicator } from "react-native";
 import HomeScreen from "./screens/HomeScreen";
 import LoginScreen from "./screens/LoginScreen";
 import DashboardScreen from "./screens/DashboardScreen";
-import { AuthProvider, useAuth } from './context/AuthContext';
- 
-const Stack = createNativeStackNavigator();
- 
+import FraisAddScreen from "./screens/FraisAddScreen";
+import FraisEditScreen from "./screens/FraisEditScreen";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
-// Composant séparé : nécessaire car useAuth() doit être appelé
-// À L'INTÉRIEUR de <AuthProvider>, pas dans App() qui le pose.
+const Stack = createNativeStackNavigator();
+
 function AppNavigator() {
-  const { user } = useAuth();
+  const { user, sessionLoading } = useAuth();
+
+  if (sessionLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={HomeScreen} />
+      {/* navigationKey : quand on change de groupe (connexion / déconnexion),
+          la pile est vidée et on démarre sur le 1er écran du nouveau groupe */}
       {user ? (
-        <Stack.Screen name="Dashboard" component={DashboardScreen} />
+        <Stack.Group navigationKey="connecte">
+          <Stack.Screen name="Dashboard" component={DashboardScreen} />
+          <Stack.Screen name="FraisAdd" component={FraisAddScreen} />
+          <Stack.Screen name="FraisEdit" component={FraisEditScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
+        </Stack.Group>
       ) : (
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Group navigationKey="invite">
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+        </Stack.Group>
       )}
     </Stack.Navigator>
   );
