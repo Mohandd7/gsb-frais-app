@@ -27,3 +27,7 @@ Pour créer un fichier APK installable directement sur un téléphone.
 
 Pourquoi le HTTPS est obligatoire sur Android 9+ ?
 Pour sécuriser les échanges avec le serveur et éviter l'interception des mots de passe et des données personnelles.
+
+Voici le lien du fichier apk :
+
+https://www.transfernow.net/dl/20261106PrGIM44n
